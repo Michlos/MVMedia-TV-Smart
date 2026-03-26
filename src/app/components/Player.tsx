@@ -171,7 +171,8 @@ export function Player() {
         <div className="relative h-full px-8 md:px-12 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="bg-blue-600/90 p-5 rounded-2xl shadow-lg shadow-blue-500/20 backdrop-blur-sm">
-              <MonitorPlay size={48} className="text-white" />
+              {/* <MonitorPlay size={48} className="text-white" /> */}
+              <img src="/src/img/icon.svg" alt="Ícone Monitor" className="w-15 h-15" />
             </div>
             <div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-lg">
