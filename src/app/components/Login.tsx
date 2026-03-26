@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import headerImg from "/src/img/header.png";
+import iconSvg from "/src/img/icon.svg";
 
 export function Login() {
   const [username, setUsername] = useState("");
@@ -68,7 +69,7 @@ export function Login() {
       <div className="z-10 w-full max-w-md p-10 bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl">
         <div className="flex flex-col items-center mb-10">
           <div className="bg-blue-600 p-4 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
-            <img src="/src/img/icon.svg" alt="Ícone Monitor" className="w-15 h-15" />
+            <img src={iconSvg} alt="icone Monitor" className="w-15 h-15" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white">MVMedia</h1>
           <p className="text-slate-400 mt-2 text-center text-lg">Plataforma de Mídia Indoor</p>

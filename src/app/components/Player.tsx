@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import headerImg from "/src/img/header.png";
+import iconSvg from "/src/img/icon.svg";
 
 const VIDEOS = [
   {
@@ -172,7 +173,7 @@ export function Player() {
           <div className="flex items-center gap-6">
             <div className="bg-blue-600/90 p-5 rounded-2xl shadow-lg shadow-blue-500/20 backdrop-blur-sm">
               {/* <MonitorPlay size={48} className="text-white" /> */}
-              <img src="/src/img/icon.svg" alt="Ícone Monitor" className="w-15 h-15" />
+              <img src={iconSvg} alt="Ícone Monitor" className="w-15 h-15" />
             </div>
             <div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-lg">
