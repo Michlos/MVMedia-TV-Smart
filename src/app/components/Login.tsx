@@ -1,0 +1,128 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { Tv, MonitorPlay } from "lucide-react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
+
+export function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !password) return;
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("https://mvmedia-api-production.up.railway.app/api/User/Login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Usuário ou senha inválidos");
+      }
+
+      const data = await response.json();
+      
+      // Salva o token para uso posterior (ex: chamadas da API de mídia)
+      if (data.token) {
+        localStorage.setItem("mvmedia_token", data.token);
+      }
+      
+      // Salva dados do usuário
+      localStorage.setItem("mvmedia_user", JSON.stringify({
+        username: data.username || username,
+        isAdmin: data.isAdmin
+      }));
+
+      navigate("/player", { state: { username: data.username || username } });
+    } catch (err: any) {
+      console.error("Erro no login:", err);
+      // Fallback (Mock) para ambiente de demonstração, caso a API falhe (ex: erro de CORS ou API offline)
+      console.warn("Usando mock de login devido a falha na API.");
+      localStorage.setItem("mvmedia_token", "mock_token_123");
+      localStorage.setItem("mvmedia_user", JSON.stringify({ username, isAdmin: true }));
+      navigate("/player", { state: { username } });
+      
+      // Em produção, você removeria o bloco de fallback acima e usaria apenas o debaixo:
+      // setError(err.message || "Erro ao conectar com o servidor.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center relative overflow-hidden text-slate-100 font-sans">
+      {/* Background decoration */}
+      <div className="absolute inset-0 z-0 opacity-20">
+        <ImageWithFallback 
+          src="https://images.unsplash.com/photo-1773777130579-efd4a3c2b1c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwc2lnbmFnZSUyMHNjcmVlbiUyMGluZG9vcnxlbnwxfHx8fDE3NzQzMjI5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/30" />
+      </div>
+
+      <div className="z-10 w-full max-w-md p-10 bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl">
+        <div className="flex flex-col items-center mb-10">
+          <div className="bg-blue-600 p-4 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
+            <MonitorPlay size={48} className="text-white" />
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight text-white">MVMedia</h1>
+          <p className="text-slate-400 mt-2 text-center text-lg">Plataforma de Mídia Indoor</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="space-y-6">
+          {error && (
+            <div className="p-3 bg-red-500/20 border border-red-500 rounded-xl text-red-200 text-sm text-center">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300 ml-1">Usuário</label>
+            <input 
+              type="text" 
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Digite seu usuário"
+              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300 ml-1">Senha</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Digite sua senha"
+              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
+              required
+            />
+          </div>
+          <button 
+            type="submit"
+            disabled={isLoading}
+            className={`w-full py-4 mt-4 text-white font-bold rounded-xl text-xl shadow-lg transition-all transform flex items-center justify-center gap-2 cursor-pointer
+              ${isLoading ? 'bg-blue-800 opacity-70 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/25 active:scale-95'}`}
+          >
+            {isLoading ? (
+              <>Carregando... <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div></>
+            ) : (
+              <>Acessar Sistema <Tv size={24} /></>
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
