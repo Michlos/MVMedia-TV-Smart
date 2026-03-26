@@ -47,14 +47,7 @@ export function Login() {
       navigate("/player", { state: { username: data.username || username } });
     } catch (err: any) {
       console.error("Erro no login:", err);
-      // Fallback (Mock) para ambiente de demonstração, caso a API falhe (ex: erro de CORS ou API offline)
-      console.warn("Usando mock de login devido a falha na API.");
-      localStorage.setItem("mvmedia_token", "mock_token_123");
-      localStorage.setItem("mvmedia_user", JSON.stringify({ username, isAdmin: true }));
-      navigate("/player", { state: { username } });
-      
-      // Em produção, você removeria o bloco de fallback acima e usaria apenas o debaixo:
-      // setError(err.message || "Erro ao conectar com o servidor.");
+      setError(err.message || "Rrro ao conecatar com o servidor.")
     } finally {
       setIsLoading(false);
     }
