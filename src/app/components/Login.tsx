@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -10,6 +10,20 @@ export function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  //focusbuild 1: focar o username quando login inválido
+  const userNameRef = useRef<HTMLInputElement>(null);
+  const focusUserName = () => {
+
+    const inputElement = document.getElementById("username") as HTMLInputElement;
+    inputElement.focus();
+    inputElement.select();
+    
+    
+    
+    
+  };
+
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -17,10 +31,11 @@ export function Login() {
     const username = formData.get("username") as string;
     const password = formData.get("password") as string;
 
-    if (!username || !password) return;
+    if (!username || !password)  return;
 
     setIsLoading(true);
     setError("");
+    
 
     try {
       const response = await fetch("https://mvmedia-api-production.up.railway.app/api/User/Login", {
@@ -32,7 +47,13 @@ export function Login() {
       });
 
       if (!response.ok) {
+        
+    
+        focusUserName();
+        
         throw new Error("Usuário ou senha inválidos");
+        
+
       }
 
       const data = await response.json();
@@ -50,10 +71,14 @@ export function Login() {
 
       navigate("/player", { state: { username: data.username || username } });
     } catch (err: any) {
+      
       console.error("Erro no login:", err);
+      focusUserName();
       setError(err.message || "Erro ao conectar com o servidor.");
+      
     } finally {
       setIsLoading(false);
+    
     }
   };
 
@@ -88,6 +113,7 @@ export function Login() {
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-300 ml-1" htmlFor="username">Usuário</label>
             <input 
+              ref={userNameRef}
               id="username"
               name="username"
               type="text" 
