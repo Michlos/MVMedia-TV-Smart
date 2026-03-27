@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useTVNavigation } from "../hooks/useTVNavigation";
+import { useTVNavigation } from "../hook/useTvNavigation";
 
 export function Login() {
   useTVNavigation();
