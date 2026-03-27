@@ -23,7 +23,7 @@ export function Login() {
     setError("");
 
     try {
-      const response = await fetch("mvmedia-api-production.up.railway.app/api/User/Login", {
+      const response = await fetch("https://mvmedia-api-production.up.railway.app/api/User/Login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
