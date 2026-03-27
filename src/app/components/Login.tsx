@@ -3,19 +3,20 @@ import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTVNavigation } from "../hook/useTvNavigation";
-import headerImg from "/src/img/header.png";
-import iconSvg from "/src/img/icon.svg";
 
 export function Login() {
   useTVNavigation();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
     if (!username || !password) return;
 
     setIsLoading(true);
@@ -61,7 +62,7 @@ export function Login() {
       {/* Background decoration */}
       <div className="absolute inset-0 z-0 opacity-20">
         <ImageWithFallback 
-          src={headerImg}
+          src="https://images.unsplash.com/photo-1773777130579-efd4a3c2b1c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwc2lnbmFnZSUyMHNjcmVlbiUyMGluZG9vcnxlbnwxfHx8fDE3NzQzMjI5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
           alt="Background"
           className="w-full h-full object-cover"
         />
@@ -71,8 +72,7 @@ export function Login() {
       <div className="z-10 w-full max-w-md p-10 bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl">
         <div className="flex flex-col items-center mb-10">
           <div className="bg-blue-600 p-4 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
-            {/* <MonitorPlay size={48} className="text-white" /> */}
-            <img src={iconSvg} alt="icone Monitor" className="w-15 h-15" />
+            <MonitorPlay size={48} className="text-white" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white">MVMedia</h1>
           <p className="text-slate-400 mt-2 text-center text-lg">Plataforma de Mídia Indoor</p>
@@ -86,24 +86,24 @@ export function Login() {
           )}
           
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300 ml-1">Usuário</label>
+            <label className="text-sm font-medium text-slate-300 ml-1" htmlFor="username">Usuário</label>
             <input 
+              id="username"
+              name="username"
               type="text" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
               placeholder="Digite seu usuário"
-              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
+              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
               required
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300 ml-1">Senha</label>
+            <label className="text-sm font-medium text-slate-300 ml-1" htmlFor="password">Senha</label>
             <input 
+              id="password"
+              name="password"
               type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Digite sua senha"
-              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
+              className="w-full px-5 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
               required
             />
           </div>

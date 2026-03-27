@@ -1,10 +1,8 @@
-import headerImg from "/src/img/header.png";
-import iconSvg from "/src/img/icon.svg";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useTVNavigation } from "../hook/useTvNavigation";
+import { useTVNavigation } from "../hook/useTVNavigation";
 
 const VIDEOS = [
   {
@@ -42,7 +40,7 @@ export function Player() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -52,6 +50,20 @@ export function Player() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Tentativa de ativar o Fullscreen nativo da TV (ou do navegador) automaticamente.
+    // A interação do usuário na tela de login (clique ou botão Ok) nos dá a permissão necessária para chamar isso.
+    const attemptNativeFullscreen = async () => {
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (err) {
+        console.warn("Não foi possível ativar o fullscreen nativo automaticamente:", err);
+      }
+    };
+    
+    attemptNativeFullscreen();
+
     const fetchVideos = async () => {
       setIsLoading(true);
       try {
@@ -61,7 +73,7 @@ export function Player() {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const response = await fetch("https://mvmedia-api-production.up.railway.app/api/MediaFile/ListActiveMediaFeles", {
+        const response = await fetch("https://mvmedia-api-production.up.railway.app/api/MediaFile/ListActiveMediaFiles", {
           method: "GET",
           headers
         });
@@ -105,6 +117,9 @@ export function Player() {
   const currentVideo = videos[currentVideoIndex];
 
   const handleLogout = () => {
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
     navigate("/");
   };
 
@@ -133,8 +148,21 @@ export function Player() {
     setIsFullscreen(true);
   };
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = async () => {
     setIsFullscreen(!isFullscreen);
+    try {
+      if (!isFullscreen) {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn("Fullscreen nativo não pôde ser ativado/desativado:", err);
+    }
   };
 
   const handleEnded = () => {
@@ -195,7 +223,7 @@ export function Player() {
       {/* Header Area */}
       <header className="relative h-48 md:h-64 flex-shrink-0 overflow-hidden shadow-2xl z-10">
         <ImageWithFallback 
-          src={headerImg}
+          src="https://images.unsplash.com/photo-1773777130579-efd4a3c2b1c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwc2lnbmFnZSUyMHNjcmVlbiUyMGluZG9vcnxlbnwxfHx8fDE3NzQzMjI5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
           alt="MVMedia Header Background"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
@@ -204,8 +232,7 @@ export function Player() {
         <div className="relative h-full px-8 md:px-12 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="bg-blue-600/90 p-5 rounded-2xl shadow-lg shadow-blue-500/20 backdrop-blur-sm">
-              {/* <MonitorPlay size={48} className="text-white" /> */}
-              <img src={iconSvg} alt="Icon Monitor" className="w-15 h15" />
+              <MonitorPlay size={48} className="text-white" />
             </div>
             <div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-lg">
@@ -395,4 +422,3 @@ export function Player() {
     </div>
   );
 }
-
