@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import headerImg from "/src/img/header.png";
+import iconSvg from "/src/img/icon.svg";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import headerImg from "/src/img/header.png";
-import iconSvg from "/src/img/icon.svg";
+import { useTVNavigation } from "../hook/useTvNavigation";
 
 const VIDEOS = [
   {
@@ -33,6 +34,7 @@ const VIDEOS = [
 ];
 
 export function Player() {
+  useTVNavigation();
   const location = useLocation();
   const navigate = useNavigate();
   const username = location.state?.username || "Administrador";
@@ -41,6 +43,8 @@ export function Player() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(false);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [videos, setVideos] = useState<any[]>([]);
@@ -57,7 +61,7 @@ export function Player() {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const response = await fetch("https://mvmedia-api-production.up.railway.app/api/MediaFile/ListActiveMediaFiles", {
+        const response = await fetch("https://mvmedia-api-production.up.railway.app/api/MediaFile/ListActiveMediaFeles", {
           method: "GET",
           headers
         });
@@ -158,6 +162,34 @@ export function Player() {
     }
   };
 
+  const handleUserActivity = useCallback(() => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying && !videoError) {
+        setShowControls(false);
+      }
+    }, 3000);
+  }, [isPlaying, videoError]);
+
+  useEffect(() => {
+    // Show controls initially or when pausing/error changes
+    handleUserActivity();
+  }, [handleUserActivity, currentVideoIndex]);
+
+  useEffect(() => {
+    const handleGlobalInteraction = () => handleUserActivity();
+    window.addEventListener('mousemove', handleGlobalInteraction);
+    window.addEventListener('keydown', handleGlobalInteraction);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalInteraction);
+      window.removeEventListener('keydown', handleGlobalInteraction);
+      if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+    };
+  }, [handleUserActivity]);
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col font-sans text-slate-100">
       {/* Header Area */}
@@ -173,7 +205,7 @@ export function Player() {
           <div className="flex items-center gap-6">
             <div className="bg-blue-600/90 p-5 rounded-2xl shadow-lg shadow-blue-500/20 backdrop-blur-sm">
               {/* <MonitorPlay size={48} className="text-white" /> */}
-              <img src={iconSvg} alt="Ícone Monitor" className="w-15 h-15" />
+              <img src={iconSvg} alt="Icon Monitor" className="w-15 h15" />
             </div>
             <div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight text-white drop-shadow-lg">
@@ -198,7 +230,7 @@ export function Player() {
             <div className="w-px h-8 bg-slate-700 mx-2"></div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-xl transition-colors font-medium cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded-xl transition-colors font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-400"
             >
               <LogOut size={18} />
               <span>Sair</span>
@@ -237,7 +269,7 @@ export function Player() {
                 <p className="text-xl">Erro ao carregar o vídeo.</p>
                 <button 
                   onClick={() => handleEnded()}
-                  className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-white transition-colors"
+                  className="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-white transition-colors focus:outline-none focus:ring-4 focus:ring-blue-500"
                 >
                   Pular para o próximo
                 </button>
@@ -258,11 +290,11 @@ export function Player() {
               />
             )}
             
-            {/* Custom Overlay Controls that appear on hover or when paused */}
-            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isPlaying && !videoError ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
+            {/* Custom Overlay Controls that appear on interaction, hover or when paused */}
+            <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-300 ${isPlaying && !videoError && !showControls ? 'opacity-0' : 'opacity-100'}`}>
               <button 
                 onClick={handlePlayPause}
-                className="p-6 bg-blue-600/90 hover:bg-blue-500 text-white rounded-full shadow-2xl transform transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                className="p-6 bg-blue-600/90 hover:bg-blue-500 text-white rounded-full shadow-2xl transform transition-transform hover:scale-110 active:scale-95 disabled:opacity-50 focus:outline-none focus:ring-4 focus:ring-blue-400 focus:scale-110"
                 disabled={videoError}
               >
                 <Play size={48} className={isPlaying ? "hidden" : "block ml-2"} />
@@ -277,14 +309,14 @@ export function Player() {
             {/* Absolute Fullscreen button */}
             <button 
               onClick={toggleFullscreen}
-              className={`absolute bottom-6 right-6 p-4 bg-slate-900/80 hover:bg-blue-600 text-white rounded-xl backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-lg ${isFullscreen && isPlaying && !videoError ? '' : isFullscreen ? 'opacity-100 bg-blue-600' : ''}`}
+              className={`absolute bottom-6 right-6 p-4 bg-slate-900/80 hover:bg-blue-600 focus:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-400 text-white rounded-xl backdrop-blur-md transition-all shadow-lg ${(!showControls && isFullscreen) ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
               title="Alternar Tela Cheia"
             >
               <Maximize size={28} />
             </button>
             
             {/* Video Info Overlay */}
-            <div className="absolute top-6 left-6 px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-lg text-white font-medium shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className={`absolute top-6 left-6 px-4 py-2 bg-slate-900/80 backdrop-blur-md rounded-lg text-white font-medium shadow-lg transition-opacity ${!showControls && isFullscreen ? 'opacity-0' : 'opacity-100'}`}>
               Reproduzindo: {currentVideo.title}
             </div>
           </div>
@@ -296,7 +328,7 @@ export function Player() {
             </div>
             <button 
               onClick={toggleFullscreen}
-              className="flex items-center gap-3 px-6 py-4 bg-slate-800 hover:bg-blue-600 text-white rounded-xl transition-colors font-medium text-lg"
+              className="flex items-center gap-3 px-6 py-4 bg-slate-800 hover:bg-blue-600 text-white rounded-xl transition-colors font-medium text-lg focus:outline-none focus:ring-4 focus:ring-blue-500"
             >
               <Maximize size={24} /> Modo TV (Tela Cheia)
             </button>
@@ -363,3 +395,4 @@ export function Player() {
     </div>
   );
 }
+

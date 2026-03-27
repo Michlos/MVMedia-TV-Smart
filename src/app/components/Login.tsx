@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useTVNavigation } from "../hooks/useTVNavigation";
 import headerImg from "/src/img/header.png";
 import iconSvg from "/src/img/icon.svg";
 
 export function Login() {
+  useTVNavigation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +50,7 @@ export function Login() {
       navigate("/player", { state: { username: data.username || username } });
     } catch (err: any) {
       console.error("Erro no login:", err);
-      setError(err.message || "Rrro ao conecatar com o servidor.")
+      setError(err.message || "Erro ao conectar com o servidor.");
     } finally {
       setIsLoading(false);
     }
@@ -69,6 +71,7 @@ export function Login() {
       <div className="z-10 w-full max-w-md p-10 bg-slate-900/80 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl">
         <div className="flex flex-col items-center mb-10">
           <div className="bg-blue-600 p-4 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
+            {/* <MonitorPlay size={48} className="text-white" /> */}
             <img src={iconSvg} alt="icone Monitor" className="w-15 h-15" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white">MVMedia</h1>
@@ -107,7 +110,7 @@ export function Login() {
           <button 
             type="submit"
             disabled={isLoading}
-            className={`w-full py-4 mt-4 text-white font-bold rounded-xl text-xl shadow-lg transition-all transform flex items-center justify-center gap-2 cursor-pointer
+            className={`w-full py-4 mt-4 text-white font-bold rounded-xl text-xl shadow-lg transition-all transform flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-400 focus:scale-[1.02]
               ${isLoading ? 'bg-blue-800 opacity-70 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/25 active:scale-95'}`}
           >
             {isLoading ? (
