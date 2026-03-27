@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useTVNavigation } from "../hook/useTVNavigation";
+import { useTVNavigation } from "../hook/useTvNavigation";
 
 const VIDEOS = [
   {
