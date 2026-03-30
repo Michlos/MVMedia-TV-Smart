@@ -94,7 +94,7 @@ export function Player() {
             title: item.title || item.name || `Vídeo ${item.id}`,
             // O source passa a ser o endpoint GetToPlay com o id
             src: `https://mvmedia-api-production.up.railway.app/api/MediaFile/GetToPlay/${item.id}`,
-            thumbnail: item.thumbnailUrl || "https://images.unsplash.com/photo-1617634667039-8e4cb277ab46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuYXR1cmUlMjBsYW5kc2NhcGV8ZW58MXx8fHwxNzc0MjgyMjg5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+            thumbnail: `https://mvmedia-api-production.up.railway.app/Videos/${item.thumbFileName}`,
           }));
           setVideos(mappedVideos);
         } else {
@@ -305,6 +305,7 @@ export function Player() {
               <video 
                 ref={videoRef}
                 src={currentVideo.src}
+                thumbnail = {currentVideo.thumbnail}
                 className="w-full h-full object-contain"
                 onEnded={handleEnded}
                 onPlay={() => setIsPlaying(true)}
