@@ -1,8 +1,10 @@
+// @ts-ignore
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTVNavigation } from "../hook/useTvNavigation";
+import {API_URLS } from "./api/ApiUrl";
 
 const VIDEOS = [
   {
@@ -73,7 +75,7 @@ export function Player() {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const response = await fetch("https://mvmedia-api-production.up.railway.app/api/MediaFile/ListActiveMediaFiles", {
+        const response = await fetch(API_URLS.LIST_FILES, {
           method: "GET",
           headers
         });
@@ -93,8 +95,8 @@ export function Player() {
             id: item.id || Math.random().toString(),
             title: item.title || item.name || `Vídeo ${item.id}`,
             // O source passa a ser o endpoint GetToPlay com o id
-            src: `https://mvmedia-api-production.up.railway.app/api/MediaFile/GetToPlay/${item.id}`,
-            thumbnail: `https://mvmedia-api-production.up.railway.app/Videos/${item.thumbFileName}`,
+            src: `${API_URLS.PLAY_FILE}${item.id}`,
+            thumbnail: `${API_URLS.GET_TUMB}${item.thumbFileName}`,
           }));
           setVideos(mappedVideos);
         } else {
@@ -155,7 +157,8 @@ export function Player() {
         if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
           await document.documentElement.requestFullscreen();
         }
-      } else {
+      } 
+      else {
         if (document.fullscreenElement && document.exitFullscreen) {
           await document.exitFullscreen();
         }
@@ -202,10 +205,10 @@ export function Player() {
     }, 3000);
   }, [isPlaying, videoError]);
 
-  useEffect(() => {
-    // Show controls initially or when pausing/error changes
-    handleUserActivity();
-  }, [handleUserActivity, currentVideoIndex]);
+  // useEffect(() => {
+  //   // Show controls initially or when pausing/error changes
+  //   handleUserActivity();
+  // }, [handleUserActivity, currentVideoIndex]);
 
   useEffect(() => {
     const handleGlobalInteraction = () => handleUserActivity();
@@ -289,7 +292,7 @@ export function Player() {
           <>
             {/* Main Player Section */}
             <section className={`flex flex-col bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 rounded-none border-none' : ''}`}>
-              <div className={`relative w-full bg-black group ${isFullscreen ? 'h-full' : 'aspect-video'}`}>
+              <div className={`relative w-full bg-black group ${isFullscreen ? 'h-full' : 'aspect-video'}`} onClick={handleUserActivity}>
             {videoError ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 gap-4">
                 <AlertCircle size={64} className="text-red-500" />

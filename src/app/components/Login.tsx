@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Tv, MonitorPlay } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTVNavigation } from "../hook/useTvNavigation";
+import { API_URLS } from "./api/ApiUrl";
 
 export function Login() {
   useTVNavigation();
@@ -38,7 +39,7 @@ export function Login() {
     
 
     try {
-      const response = await fetch("https://mvmedia-api-production.up.railway.app/api/User/Login", {
+      const response = await fetch(API_URLS.LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
