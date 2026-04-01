@@ -387,6 +387,7 @@ export function Player() {
                   }`}
                 >
                   <div className="aspect-video relative overflow-hidden">
+                    {console.log("URL thubmnail = "{video.thumbnail})}
                     <img 
                       src={video.thumbnail}
                       alt={video.title}
