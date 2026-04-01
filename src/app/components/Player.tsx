@@ -97,7 +97,7 @@ export function Player() {
             title: item.title || item.name || `Vídeo ${item.id}`,
             // O source passa a ser o endpoint GetToPlay com o id
             src: `${API_URLS.PLAY_FILE}${item.id}`,
-            thumbnail: `${API_URLS.GET_TUMB}${item.thumbFileName}`,
+            thumbnail: `${API_URLS.GET_TUMB}${item.id}`,
           }));
           setVideos(mappedVideos);
         } else {
