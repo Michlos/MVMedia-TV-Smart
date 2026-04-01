@@ -387,7 +387,7 @@ export function Player() {
                   }`}
                 >
                   <div className="aspect-video relative overflow-hidden">
-                    <ImageWithFallback 
+                    <img 
                       src={video.thumbnail}
                       alt={video.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
