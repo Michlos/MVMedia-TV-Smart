@@ -5,6 +5,7 @@ import { Play, Maximize, MonitorPlay, Tv, AlertCircle, LogOut, User } from "luci
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useTVNavigation } from "../hook/useTvNavigation";
 import {API_URLS } from "./api/ApiUrl";
+import headerImg from "/src/img/header.png";
 
 const VIDEOS = [
   {
@@ -226,7 +227,7 @@ export function Player() {
       {/* Header Area */}
       <header className="relative h-48 md:h-64 flex-shrink-0 overflow-hidden shadow-2xl z-10">
         <ImageWithFallback 
-          src="https://images.unsplash.com/photo-1773777130579-efd4a3c2b1c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaWdpdGFsJTIwc2lnbmFnZSUyMHNjcmVlbiUyMGluZG9vcnxlbnwxfHx8fDE3NzQzMjI5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          src={headerImg}
           alt="MVMedia Header Background"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
